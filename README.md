@@ -75,8 +75,8 @@ Windows 上安装 IntelliJ IDEA<br>
 ![idea9](./img/idea9.png)<br>
 是否导入配置，我选择的是不导入<br>
 后面请一路next直到激活界面，选择试用<br>
-![idea10](./img/idea10.png)<br>
-![idea11](./img/idea11.png)<br>
+![idea10](./img/idea10.PNG)<br>
+![idea11](./img/idea11.PNG)<br>
 ## 无环境启动
 方式一:直接打开线上网站进行观看[链接](http://vue.etoak.com/)<br>
 方式二:启动下载目录中的nginx-1.16.1<br>
@@ -88,6 +88,23 @@ Windows 上安装 IntelliJ IDEA<br>
 输入.\nginx.exe -s stop 停止nginx 如下:<br>
 ![img3](./img/img3.jpg)<br>
 ## 编译安装
-如已安装好环境请继续,如未安装好请看[环境准备](#环境准备)
-
+如已安装好环境请继续,如未安装好请看[环境准备](#环境准备)<br>
+进入下载文件中的et目录按住Shift 点击鼠标右键<br>
+![img1](./img/img1.png)<br>
+选择`在此处打开 Powershell 窗口`打开命令行窗口 输入npm install<回车> 如下:<br>
+![img4](./img/img4.png)<br>
+安装完成后会在et目录下生成node_modules目录<br>
+直接启动: 在Powershell窗口中直接输入npm run dev <回车> <br>
+![img5](./img/img5.png)<br>
+在浏览器中直接访问[http://localhost:8090](http://localhost:8090)<br>
+在IDEA中启动:<br>
+![img6](./img/img6.jpg)<br>
+选择et目录<br>
+![img7](./img/img7.jpg)<br>
+![img8](./img/img8.jpg)<br>
+![img9](./img/img9.jpg)<br>
+配置node路径<br>
+![img10](./img/img10.jpg)<br>
+![img11](./img/img11.jpg)<br>
+启动完成后在浏览器中直接访问[http://localhost:8090](http://localhost:8090)<br>
 ## 主要使用技术
