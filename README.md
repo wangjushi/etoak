@@ -5,7 +5,7 @@
 
 * [环境准备](#环境准备)
 	* [nodejs安装](#nodejs安装)
-	* [IntelliJ IDEA安装](#IntelliJ IDEA安装)
+	* [IntelliJ IDEA安装](#intellij-idea安装)
 * [无环境启动](#无环境启动)
 * [编译安装](#编译安装)
 * [主要使用组件](#主要使用组件)
@@ -13,6 +13,8 @@
 		* [Grids(栅格)](#Grids栅格)
 		* [Sheets(延展纸)](#Sheets延展纸)
 		* [Parallax(视差)](#Parallax视差)
+		* [Hover(悬停)](#Hover悬停)
+		* [Data iterators(数据迭代器)](#Data-iterators数据迭代器)
 	* [echarts](#echarts)
 	* [axios](#axios)
 	* [vuex](#vuex)
@@ -343,8 +345,318 @@ v-hover 组件为任何组件处理悬停状态提供了一个干净的接口。
   }
 </script>
 ```
+效果如下:<br>
+![xg4](./img/xg4.jpg)<br>
+![xg3](./img/xg3.jpg)<br>
+#### Data iterators(数据迭代器)
+v-data-iterator 组件用于显示数据，并将其大部分功能与 v-data-table 组件共享。功能包括排序、搜索、分页和选择。<br>
+``` vue
+<template xmlns:v-slot="http://www.w3.org/1999/XSL/Transform">
+  <v-responsive class="overflow-y-auto" :max-height="$store.state.maxHeight">
+  <v-container fluid>
+    <div class="display-1 mb-2 white--text">易途高薪就业案例</div>
+    <v-chip
+      class="ma-2"
+      label
+      text-color="white"
+      dark
+      style="height:auto"
+    >
+    
+      <v-icon left>mdi-twitter</v-icon>
+      <div style="white-space: pre-wrap;">
+      近年来易途高薪就业的案例层出不穷，我们仅以人员固定编号的形式来陈述这个事实
+      </div>
+    </v-chip>
+    <v-data-iterator
+      :items="items"
+      :items-per-page.sync="itemsPerPage"
+      :page="page"
+      :search="search"
+      :sort-by="sortBy.toLowerCase()"
+      :sort-desc="sortDesc"
+      hide-default-footer
+      dark
+    >
+      <template v-slot:header dark>
+        <v-toolbar
+          dark
+          class="mb-1"
+        >
+          <v-text-field
+            v-model="search"
+            clearable
+            flat
+            solo-inverted
+            hide-details
+            label="查询"
+          ></v-text-field>
+          <template v-if="$vuetify.breakpoint.mdAndUp">
+            <v-spacer></v-spacer>
+            <v-select
+              v-model="sortBy"
+              flat
+              solo-inverted
+              hide-details
+              :items="keys"
+              label="排序"
+            ></v-select>
+            <v-spacer></v-spacer>
+            <v-btn-toggle
+              v-model="sortDesc"
+              mandatory
+            >
+              <v-btn
+                large
+                depressed
+                :value="false"
+              >
+                <v-icon>mdi-arrow-up</v-icon>
+              </v-btn>
+              <v-btn
+                large
+                depressed
+                :value="true"
+              >
+                <v-icon>mdi-arrow-down</v-icon>
+              </v-btn>
+            </v-btn-toggle>
+          </template>
+        </v-toolbar>
+      </template>
+
+      <template v-slot:default="props">
+        <v-row>
+          <v-col
+            v-for="item in props.items"
+            :key="item.name"
+            cols="12"
+            sm="6"
+            md="4"
+            lg="3"
+          >
+            <v-card>
+              <v-card-title class="subheading font-weight-bold"></v-card-title>
+
+              <v-divider></v-divider>
+
+              <v-list dense>
+                <v-list-item
+                  v-for="(key, index) in filteredKeys"
+                  :key="index"
+                >
+                  <v-col cols="2"><v-icon v-if="index==1" class="pr-1">mdi-heart-outline</v-icon>
+                  <span v-else>&emsp;&nbsp;&nbsp;</span></v-col>
+                  <v-list-item-content :class="{ 'blue--text': sortBy === key }">{{ key }}:</v-list-item-content>
+                  <v-list-item-content class="align-end" :class="{ 'blue--text': sortBy === key }">{{ item[key.toLowerCase()] }}</v-list-item-content>
+                </v-list-item>
+              </v-list>
+            </v-card>
+          </v-col>
+        </v-row>
+      </template>
+
+      <template v-slot:footer>
+        <v-row class="mt-2" align="center" justify="center">
+          <span class="white--text">每页显示条数</span>
+          <v-menu offset-y>
+            <template v-slot:activator="{ on }">
+              <v-btn
+                text
+                class="ml-2"
+                v-on="on"
+              >
+                {{ itemsPerPage }}
+                <v-icon>mdi-chevron-down</v-icon>
+              </v-btn>
+            </template>
+            <v-list>
+              <v-list-item
+                v-for="(number, index) in itemsPerPageArray"
+                :key="index"
+                @click="updateItemsPerPage(number)"
+              >
+                <v-list-item-title dark>{{ number }}</v-list-item-title>
+              </v-list-item>
+            </v-list>
+          </v-menu>
+
+          <v-spacer></v-spacer>
+
+          <span
+            class="mr-4 white--text"
+          >
+            第 {{ page }} 页到 {{ numberOfPages }}
+          </span>
+          <v-btn
+            fab
+            class="mr-1"
+            @click="formerPage"
+            style="margin-left:15%;"
+          >
+            <v-icon>mdi-chevron-left</v-icon>
+          </v-btn>
+          <v-btn
+            fab
+            class="ml-1"
+            @click="nextPage"
+          >
+            <v-icon>mdi-chevron-right</v-icon>
+          </v-btn>
+        </v-row>
+      </template>
+    </v-data-iterator>
+  </v-container>
+</v-responsive>
+</template>
+<style></style>
+<script>
+
+  import data from '@/common/data.js';
+
+  export default {
+    data () {
+      return {
+        itemsPerPageArray: [8, 12 , 16],
+        search: '',
+        filter: {},
+        sortDesc: false,
+        page: 1,
+        itemsPerPage: 8,
+        sortBy: 'name',
+        keys: [
+          '编号',
+          '姓名',
+          '薪资',
+          '所在城市',
+          '企业名称',
+        ],
+        items: data,
+      }
+    },
+    computed: {
+      numberOfPages () {
+        return Math.ceil(this.items.length / this.itemsPerPage)
+      },
+      filteredKeys () {
+        return this.keys.filter(key => key !== `Name`)
+      },
+    },
+    mounted(){
+      
+    },
+    methods: {
+      nextPage () {
+        if (this.page + 1 <= this.numberOfPages) this.page += 1
+      },
+      formerPage () {
+        if (this.page - 1 >= 1) this.page -= 1
+      },
+      updateItemsPerPage (number) {
+        this.itemsPerPage = number
+      },
+    },
+  }
+</script>
+```
+效果如下:
+![xg5](./img/xg5.jpg)<br>
 ### echarts
 `echarts` 一个使用 JavaScript 实现的开源可视化库，可以流畅的运行在 PC 和移动设备上，兼容当前绝大部分浏览器（IE8/9/10/11，Chrome，Firefox，Safari等），底层依赖矢量图形库 ZRender，提供直观，交互丰富，可高度个性化定制的数据可视化图表。<br>
+在et/src/components/charts目录下有封装好的Echarts组件 代码如下:
+``` vue
+<template>
+  <div v-resize="onResize" :ref="id" style="height: 100%;"></div>
+</template>
+
+<script>
+import echarts from 'echarts'
+  export default {
+    name: "et-charts",
+    computed: {
+      options() {
+        return this.option
+      },
+    },
+    props: {
+      option: Object
+    },
+    data() {
+      return {
+        id:new Date().getTime(),
+        charts:{}
+      }
+    },
+    methods:{
+      onResize(){
+        if(this.charts.resize)
+        this.charts.resize();
+      }
+    },
+    mounted() {
+      setTimeout(()=>{
+        this.charts = echarts.init(this.$refs[this.id])
+        this.charts.setOption(this.options)
+      },200)
+    },
+    watch: {
+      options() {
+        this.charts.setOption(this.options)
+      }
+    }
+  }
+</script>
+
+<style>
+</style>
+```
+使用:
+``` vue
+<et-charts :option="flotDashboardChart"></et-charts>
+methods:{
+	flotDashboardChart() {
+		return {
+		  color: ["#03a9f4", "#0055ff"],
+		  tooltip: {
+			trigger: 'none',
+			axisPointer: {
+			  type: 'cross'
+			},
+			show: true
+		  },
+		  grid: {
+			top: "0px",
+			left: "0px",
+			right: "0px",
+			bottom: "0px"
+		  },
+		  xAxis: [{
+			show: false,
+			data: [5000,5500,6000,6500,7000,7500,8000,8500,9000,9500,10000,10500,11000,11500,12000,12500,13000]
+		  }],
+		  yAxis: [{
+			type: 'value',
+			show: false
+		  }],
+		  series: [{
+			  type: 'line',
+			  smooth: true,
+			  areaStyle: {},
+			  symbol: 'none',
+			  data: [6000,5500,6000,6500,6000,5500,7000,7500,6000,6500,6000,6500,6500,6000,5500,6500,7000]
+		  },
+			{
+			  type: 'line',
+			  smooth: true,
+			  areaStyle: {},
+			  symbol: 'none',
+			  data: [11500,12000,11000,12500,13000,11500,10500,11000,13000,12000,12000,10500,11000,11500,12000,12500,11500]
+			}
+		  ]
+		}
+	},
+}
+```
 ### axios
 `axios` Axios 是一个基于 promise 的 HTTP 库，可以用在浏览器和 node.js 中。<br>
 ### vuex
