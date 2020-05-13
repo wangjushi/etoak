@@ -22,7 +22,7 @@
 	* [vuescroll](#vuescroll)
 	* [vue-video-player](#vue-video-player)
 	* [vue-photo-preview](#vue-photo-preview)
-* [非组件技术点](#非组件技术点)
+* [目录结构](#目录结构)
 	
 ## 环境准备
 拿到源码后需要配置启动环境<br>
@@ -560,7 +560,7 @@ v-data-iterator 组件用于显示数据，并将其大部分功能与 v-data-ta
 </script>
 ```
 效果如下:
-![xg5](./img/xg5.jpg)<br>
+![xg5](./img/xg5.png)<br>
 ### echarts
 `echarts` 一个使用 JavaScript 实现的开源可视化库，可以流畅的运行在 PC 和移动设备上，兼容当前绝大部分浏览器（IE8/9/10/11，Chrome，Firefox，Safari等），底层依赖矢量图形库 ZRender，提供直观，交互丰富，可高度个性化定制的数据可视化图表。<br>
 在et/src/components/charts目录下有封装好的Echarts组件 代码如下:
@@ -659,16 +659,784 @@ methods:{
 ```
 ### axios
 `axios` Axios 是一个基于 promise 的 HTTP 库，可以用在浏览器和 node.js 中。<br>
+对axios 进行封装:
+``` js
+// 在http.js中引入axios
+import axios from 'axios'; // 引入axios
+import routerIndex from '@/router/index'
+import errorCode from "@/store/errorCode";
+import store from "@/store/index";
+import dialog from '@/components/dialog/index'
+
+// 环境的切换
+if (process.env.NODE_ENV == 'development') {
+  axios.defaults.baseURL = 'http://127.0.0.1:8080';
+} else if (process.env.NODE_ENV == 'test') {
+  axios.defaults.baseURL = '';
+} else if (process.env.NODE_ENV == 'production') {
+  axios.defaults.baseURL = 'http://127.0.0.1:8080';
+}
+
+//设置超时时间
+axios.defaults.timeout = 10000;
+//设置请求头
+axios.defaults.headers.post['Content-Type'] = 'application/json;charset=UTF-8';
+
+// 请求拦截器
+axios.interceptors.request.use(
+  config => {
+    // 每次发送请求之前判断是否存在token，如果存在，则统一在http请求的header都加上token，不用每次请求都手动添加了
+    // 即使本地存在token，也有可能token是过期的，所以在响应拦截器中要对返回状态进行判断
+    const token = store.state.token;
+    token && (config.headers.Authorization = "Bearer "+token);
+    return config;
+  },
+  error => {
+    return Promise.error(error);
+  })
+
+// 响应拦截器
+axios.interceptors.response.use(
+  // 请求成功
+  response => {
+    const data = response.data;
+    if(data.flag){ //成功
+
+    }else{
+      if((data.code >= 3000 && data.code <= 3099) && data.msg){
+        dialog.alert(data.msg,'错误');
+      }
+    }
+    return data;
+  },
+  // 请求失败
+  error => {
+    const { response } = error;
+    if (response) {
+      switch(response.status){
+        case 401:
+          routerIndex.push('/login');
+          break;
+        case 403:
+          console.log("这是403");
+          break;
+        case 404:
+          console.log("这是404");
+          break;
+        case 500:
+          console.log("这是500");
+          break;
+        default:
+          console.error("请求"+response.status);
+      }
+      return Promise.reject(response);
+    } else {
+      // 处理断网的情况
+      if (!window.navigator.onLine) {
+        //断网的情况 路由跳转到断网的页面
+      }else{
+        dialog.alert("服务器没开",'错误');
+      }
+      return Promise.reject(error);
+    }
+  });
+
+export default axios;
+```
 ### vuex
 `vuex` Vuex 是一个专为 Vue.js 应用程序开发的状态管理模式。它采用集中式存储管理应用的所有组件的状态，并以相应的规则保证状态以一种可预测的方式发生变化。Vuex 也集成到 Vue 的官方调试工具 devtools extension，提供了诸如零配置的 time-travel 调试、状态快照导入导出等高级调试功能。<br>
+封装如下:
+``` js
+import Vue from 'vue';
+import Vuex from 'vuex';
+Vue.use(Vuex);
+const store = new Vuex.Store({
+  state: {
+    token: localStorage.getItem('token') || '',
+    i18nLocale: 'zhHans',
+    userInfo: {},
+    //菜单条状态
+    drawer: false,
+    maxHeight:500,
+    menuItems: [{
+      "id": "006",
+      "permissionOrder": 7,
+      "icon": "mdi-book-open-page-variant",
+      "iconType": "0",
+      "name": "培训业务",
+      "href": "",
+      "code": "peixun",
+      "active": "true",
+      "items": [{
+        "id": "006001",
+        "permissionOrder": 0,
+        "icon": "mdi-teach",
+        "iconType": "0",
+        "name": "师资团队",
+        "href": "/team",
+        "code": "teacher",
+        "items": null
+      }, {
+        "id": "006002",
+        "permissionOrder": 1,
+        "icon": "mdi-language-java",
+        "iconType": "0",
+        "name": "课程计划",
+        "href": "/course",
+        "code": "course",
+        "items": null
+      }, {
+        "id": "006003",
+        "permissionOrder": 2,
+        "icon": "mdi-podium-gold",
+        "iconType": "0",
+        "name": "就业金榜",
+        "href": "/work",
+        "code": "gold",
+        "items": null
+      }]
+    }, {
+      "id": "007",
+      "permissionOrder": 8,
+      "icon": "mdi-contacts-outline",
+      "iconType": "0",
+      "name": "外包服务",
+      "href": "",
+      "code": "waibao",
+      "items": [{
+          "id": "007001",
+          "permissionOrder": 1,
+          "icon": "mdi-electron-framework",
+          "iconType": "0",
+          "name": "业务简介",
+          "href": "/businessProfile",
+          "code": "businessProfile"
+        },
+        {
+          "id": "007002",
+          "permissionOrder": 2,
+          "icon": "mdi-briefcase-search-outline",
+          "iconType": "0",
+          "name": "服务案例",
+          "href": "/serviceCase",
+          "code": "serviceCase"
+        },
+      ]
+    }, {
+      "id": "008",
+      "permissionOrder": 9,
+      "icon": "mdi-bug-check",
+      "iconType": "0",
+      "name": "研发业务",
+      "href": "",
+      "code": "yanfa",
+      "items": [{
+        "id": "008001",
+        "permissionOrder": 0,
+        "icon": "mdi-television-guide",
+        "iconType": "0",
+        "name": "服务案例",
+        "href": "/research",
+        "code": "project",
+        "items": null
+      }]
+    }, {
+      "id": "009",
+      "permissionOrder": 11,
+      "icon": "mdi-alpha-e-circle",
+      "iconType": "0",
+      "name": "关于我们",
+      "href": "/about",
+      "code": "about",
+      "items": []
+    }, {
+      "id": "010",
+      "permissionOrder": 10,
+      "icon": "mdi-camera-wireless",
+      "iconType": "0",
+      "name": "易途情节",
+      "href": "",
+      "code": "et",
+      "items": [{
+        "id": "010001",
+        "permissionOrder": 0,
+        "icon": "mdi-camera",
+        "iconType": "0",
+        "name": "精彩时刻 ",
+        "href": "/plot",
+        "code": "plot",
+        "items": null
+      }, {
+        "id": "010002",
+        "permissionOrder": 1,
+        "icon": "mdi-video",
+        "iconType": "0",
+        "name": "精彩回忆",
+        "href": "/video",
+        "code": "video",
+        "items": null
+      }]
+    }, {
+      "id": "011",
+      "permissionOrder": 12,
+      "icon": "mdi-card-account-phone",
+      "iconType": "0",
+      "name": "联系我们",
+      "href": "/contact",
+      "code": "lianxiwomen",
+      "items": []
+    }],
+  },
+  mutations: {
+    set_token(state, token) {
+      state.token = token
+      localStorage.setItem('token', token)
+    },
+    del_token(state) {
+      state.token = ''
+      localStorage.setItem('token', '')
+    },
+    changeI18n(state, i18n) {
+      state.i18nLocale = i18n
+    },
+    setUserInfo(state, userInfo) {
+      state.userInfo = userInfo
+    },
+    changeDrawerOff(state) {
+      setTimeout(function() {
+        state.drawer = false
+      }, 500)
+    },
+    changeDrawerOn(state) {
+      setTimeout(function() {
+        state.drawer = true
+      }, 500)
+    },
+    reverseDrawer(state) {
+      state.drawer = !state.drawer
+    },
+    setMenuItems(state, items) {
+      state.menuItems = items
+    },
+    setMaxHeight(state,height){
+      state.maxHeight = height
+    },
+  }
+});
+
+export default store;
+```
 ### router
 `router` Vue Router 是 Vue.js 官方的路由管理器。它和 Vue.js 的核心深度集成，让构建单页面应用变得易如反掌。<br>
+封装如下:
+``` js
+import Vue from 'vue'
+import Router from 'vue-router'
+import store from "@/store/index";
+import account from '@/page/account/index'
+import index from '@/page/index/index'
+import home from '@/page/home/home'
+import team from '@/page/team/teacher-team'
+import work from '@/page/work/work-list'
+import course from '@/page/course/course'
+import plot from '@/page/plot/plot-pic'
+import video from '@/page/plot/plot-video'
+import about from '@/page/about/index'
+import contact from '@/page/contact/contact'
+import research from '@/page/research/research'
+import business from '@/page/waibao/businessProfile'
+import serviceCase from '@/page/waibao/serviceCase'
+
+Vue.use(Router)
+
+const router = new Router({
+  mode: 'history',
+  routes: [{
+      path: '/',
+      component: account,
+    },
+    {
+      path: '/login',
+      component: account,
+    },
+    {
+      path: '/index',
+      component: index,
+      children: [{
+          path: '/home',
+          component: home
+        },
+        {
+          path: '/team',
+          component: team
+        },
+        {
+          path: '/work',
+          component: work
+        },
+        {
+          path: '/course',
+          component: course
+        },
+        {
+          path: '/plot',
+          component: plot
+        },
+        {
+          path: '/video',
+          component: video
+        },
+        {
+          path: '/about',
+          component: about
+        },
+        {
+          path: '/contact',
+          component: contact
+        },
+        {
+          path: '/research',
+          component: research
+        },
+        {
+          path: '/businessProfile',
+          component: business
+        },
+        {
+          path: '/serviceCase',
+          component: serviceCase
+        }
+      ]
+    },
+
+  ]
+})
+//登录拦截 暂时去掉
+/* router.beforeEach((to, from, next) => {
+  const token = store.state.token
+  if (to.matched.some(record => record.meta.noLogin)) {
+    //路由元信息requireAuth:true，或者homePages:true，则不做登录校验
+    next()
+  } else {
+    if (token) { //判断用户是否登录
+      if (Object.keys(from.query).length === 0) { //判断路由来源是否有query，处理不是目的跳转的情况
+        next()
+      } else {
+        let redirect = from.query.redirect //如果来源路由有query
+        if (to.path === redirect) { //这行是解决next无限循环的问题
+          next()
+        } else {
+          next({
+            path: redirect
+          }) //跳转到目的路由
+        }
+      }
+    } else {
+      if (to.path === "/login") {
+        next({
+          path: "/",
+          query: {
+            redirect: from.fullPath
+          } //将目的路由地址存入login的query中
+        })
+      } else {
+        next({
+          path: "/",
+          query: {
+            redirect: to.fullPath
+          } //将目的路由地址存入login的query中
+        })
+      }
+    }
+  }
+  return
+}) */
+export default router
+```
 ### vuescroll
 `vuescroll` vuescroll 是一款基于 Vue.js 自定义滚动条的插件，它有两种模式:<br>
 * native: 适用于 PC 端， 支持基本的自定义滚动条。
 * slide: 适用于移动端， 支持下拉-加载，上拉刷新，轮播等。<br>
 但是，这并不意味着 slide 模式只能用于移动端，只是因为移动端与 slide 模式更加契合而已。<br>
+代码如下:
+``` html
+<v-responsive max-height="428">
+  <vue-scroll>
+	<v-container class="pb-5">
+	  <template v-for="(item,index) in latestItems">
+		<v-row no-gutters :key="index">
+		  <v-col>
+			<p class="body-2"><a :href="item.url" target="_blank">@{{item.name}} </a>{{item.title}}</p>
+		  </v-col>
+		</v-row>
+		<v-row no-gutters class="pb-5 row-line mb-5">
+		  <v-col cols="12" md="8" class="caption" align-self="center">
+			<v-icon x-small>mdi-timer</v-icon> {{item.time}}
+		  </v-col>
+		  <v-col cols="12" md="4" class="d-flex flex-row-reverse" align-self="center">
+			<v-menu offset-y>
+			  <template v-slot:activator="{ on }">
+				<v-btn text icon v-on="on" x-small>
+				  <v-icon>mdi-dots-horizontal</v-icon>
+				</v-btn>
+			  </template>
+			  <v-list dense subheader>
+				<v-list-item v-for="(item, index) in item.keyWords" :key="index">
+				  <v-list-item-content>{{ item }}</v-list-item-content>
+				</v-list-item>
+			  </v-list>
+			</v-menu>
+		  </v-col>
+		</v-row>
+	  </template>
+	</v-container>
+  </vue-scroll>
+</v-responsive>
+```
+用法:
+``` html
+<v-responsive max-height="428">
+  <vue-scroll>
+  ....
+  </vue-scroll>
+</v-responsive>
+```
+效果:
+![xg6](./img/xg6.png)<br>
 ### vue-video-player
 `vue-video-player` 适用于 Vue 的 video.js 播放器组件。Video.js 是一个为HTML5世界而构建的网络视频播放器。它支持HTML5和Flash视频，以及YouTube和Vimeo（通过插件）。<br>
+代码如下:
+``` vue
+<template>
+  <v-responsive class="overflow-y-auto" :max-height="$store.state.maxHeight">
+  <section>
+    <v-row >
+      <v-col md="6" cols="12" sm="12" v-for="(item,key) in listOptions" :key="key">
+        <video-player class="video-player vjs-custom-skin"
+                      ref="videoPlayer"
+                      :playsinline="true"
+                      :options="item">
+        </video-player>
+      </v-col>
+    </v-row>
+  </section>
+</v-responsive>
+</template>
+<style>
+  .demo{
+    display: inline-block;
+    width: 1920px;
+    /*height: 1080px;*/
+    text-align: center;
+    line-height: 100px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    overflow: hidden;
+    background: #fff;
+    position: relative;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, .2);
+    margin-right: 4px;
+  }
+
+  .demo:hover{
+    display: block;
+  }
+</style>
+<script>
+
+  import { videoPlayer } from 'vue-video-player';
+
+  export default {
+    components: {
+        videoPlayer
+    },
+    data () {
+      return {
+        listOptions:[
+          {
+            //播放速度
+            playbackRates: [0.5, 1.0, 1.5, 2.0],
+            //如果true,浏览器准备好时开始回放。
+            autoplay: false,
+            // 默认情况下将会消除任何音频。
+            muted: false,
+            // 导致视频一结束就重新开始。
+            loop: false,
+            // 建议浏览器在<video>加载元素后是否应该开始下载视频数据。auto浏览器选择最佳行为,立即开始加载视频（如果浏览器支持）
+            preload: 'auto',
+            language: 'zh-CN',
+            // 将播放器置于流畅模式，并在计算播放器的动态大小时使用该值。值应该代表一个比例 - 用冒号分隔的两个数字（例如"16:9"或"4:3"）
+            aspectRatio: '16:9',
+            // 当true时，Video.js player将拥有流体大小。换句话说，它将按比例缩放以适应其容器。
+            fluid: true,
+            sources: [{
+              //类型
+              type: "video/mp4",
+              //url地址
+              src: 'http://vjs.zencdn.net/v/oceans.mp4'
+            }],
+            //你的封面地址
+            poster: '../../../static/video/et.jpg',
+            //允许覆盖Video.js无法播放媒体源时显示的默认信息。
+            notSupportedMessage: '此视频暂无法播放，请稍后再试',
+            controlBar: {
+              timeDivider: true,
+              durationDisplay: true,
+              remainingTimeDisplay: false,
+              //全屏按钮
+              fullscreenToggle: true
+            }
+          },
+          {
+            //播放速度
+            playbackRates: [0.5, 1.0, 1.5, 2.0],
+            //如果true,浏览器准备好时开始回放。
+            autoplay: false,
+            // 默认情况下将会消除任何音频。
+            muted: false,
+            // 导致视频一结束就重新开始。
+            loop: false,
+            // 建议浏览器在<video>加载元素后是否应该开始下载视频数据。auto浏览器选择最佳行为,立即开始加载视频（如果浏览器支持）
+            preload: 'auto',
+            language: 'zh-CN',
+            // 将播放器置于流畅模式，并在计算播放器的动态大小时使用该值。值应该代表一个比例 - 用冒号分隔的两个数字（例如"16:9"或"4:3"）
+            aspectRatio: '16:9',
+            // 当true时，Video.js player将拥有流体大小。换句话说，它将按比例缩放以适应其容器。
+            fluid: true,
+            sources: [{
+              //类型
+              type: "video/mp4",
+              //url地址
+              src: 'http://vjs.zencdn.net/v/oceans.mp4'
+            }],
+            //你的封面地址
+            poster: '../../../static/video/et.jpg',
+            //允许覆盖Video.js无法播放媒体源时显示的默认信息。
+            notSupportedMessage: '此视频暂无法播放，请稍后再试',
+            controlBar: {
+              timeDivider: true,
+              durationDisplay: true,
+              remainingTimeDisplay: false,
+              //全屏按钮
+              fullscreenToggle: true
+            }
+          },
+          {
+            //播放速度
+            playbackRates: [0.5, 1.0, 1.5, 2.0],
+            //如果true,浏览器准备好时开始回放。
+            autoplay: false,
+            // 默认情况下将会消除任何音频。
+            muted: false,
+            // 导致视频一结束就重新开始。
+            loop: false,
+            // 建议浏览器在<video>加载元素后是否应该开始下载视频数据。auto浏览器选择最佳行为,立即开始加载视频（如果浏览器支持）
+            preload: 'auto',
+            language: 'zh-CN',
+            // 将播放器置于流畅模式，并在计算播放器的动态大小时使用该值。值应该代表一个比例 - 用冒号分隔的两个数字（例如"16:9"或"4:3"）
+            aspectRatio: '16:9',
+            // 当true时，Video.js player将拥有流体大小。换句话说，它将按比例缩放以适应其容器。
+            fluid: true,
+            sources: [{
+              //类型
+              type: "video/mp4",
+              //url地址
+              src: 'http://vjs.zencdn.net/v/oceans.mp4'
+            }],
+            //你的封面地址
+            poster: '../../../static/video/et.jpg',
+            //允许覆盖Video.js无法播放媒体源时显示的默认信息。
+            notSupportedMessage: '此视频暂无法播放，请稍后再试',
+            controlBar: {
+              timeDivider: true,
+              durationDisplay: true,
+              remainingTimeDisplay: false,
+              //全屏按钮
+              fullscreenToggle: true
+            }
+          },
+          {
+            //播放速度
+            playbackRates: [0.5, 1.0, 1.5, 2.0],
+            //如果true,浏览器准备好时开始回放。
+            autoplay: false,
+            // 默认情况下将会消除任何音频。
+            muted: false,
+            // 导致视频一结束就重新开始。
+            loop: false,
+            // 建议浏览器在<video>加载元素后是否应该开始下载视频数据。auto浏览器选择最佳行为,立即开始加载视频（如果浏览器支持）
+            preload: 'auto',
+            language: 'zh-CN',
+            // 将播放器置于流畅模式，并在计算播放器的动态大小时使用该值。值应该代表一个比例 - 用冒号分隔的两个数字（例如"16:9"或"4:3"）
+            aspectRatio: '16:9',
+            // 当true时，Video.js player将拥有流体大小。换句话说，它将按比例缩放以适应其容器。
+            fluid: true,
+            sources: [{
+              //类型
+              type: "video/mp4",
+              //url地址
+              src: 'http://vjs.zencdn.net/v/oceans.mp4'
+            }],
+            //你的封面地址
+            poster: '../../../static/video/et.jpg',
+            //允许覆盖Video.js无法播放媒体源时显示的默认信息。
+            notSupportedMessage: '此视频暂无法播放，请稍后再试',
+            controlBar: {
+              timeDivider: true,
+              durationDisplay: true,
+              remainingTimeDisplay: false,
+              //全屏按钮
+              fullscreenToggle: true
+            }
+          }
+        ],
+      }
+    },
+    mounted() {
+      
+    },
+    methods:{
+        initVideo(){
+
+        }
+    },
+    computed: {
+        player() {
+            return this.$refs.videoPlayer.player
+        }
+    }
+  }
+</script>
+```
+效果如下:<br>
+![file1](README_files/1.jpg)
 ### vue-photo-preview
 `vue-photo-preview` vue-photo-preview是基于photoswipe的vue图片预览插件<br>
+代码如下:
+``` vue
+<template>
+  <v-responsive class="overflow-y-auto" :max-height="$store.state.maxHeight">
+  <v-row>
+    <v-col
+      v-for="(img,index) in imgList"
+      :key="index"
+      class="d-flex child-flex"
+      cols="12"
+      md="2"
+      sm="2"
+    >
+      <v-card flat tile class="d-flex">
+        <photo-card :img="img" :index="index"></photo-card>
+      </v-card>
+    </v-col>
+  </v-row>
+</v-responsive>
+</template>
+<style></style>
+<script>
+
+  import PhotoCard from "../../components/pic/photo-card";
+  export default {
+    components: {PhotoCard},
+    data () {
+      return {
+      }
+    },
+    computed:{
+      imgList(){
+        let imgListArr = [];
+        for(let i=0;i<46;i++){
+          imgListArr.push("../../../static/video/img"+(i+1)+".jpg");
+        }
+        return imgListArr;
+      }
+    },
+    methods: {
+        imgSrc(n){
+            // return "../../../static/img/dabai.jpg";
+            return "https://picsum.photos/500/300?image="+n;
+        },
+    },
+    mounted(){
+
+    }
+
+  }
+</script>
+```
+效果如下:<br>
+![file2](README_files/2.jpg)
+## 目录结构
+``` bash
+|------------build          构建脚本目录
+
+    |---------build.js             生产环境构建脚本
+
+    |---------check-version.js 检查node、npm等版本
+
+    |---------utils.js               构建相关工具方法
+
+    |---------vebpack.base.conf.js     webpack基本配置
+
+    |---------vebpack.dev.conf.js       webpack开发环境配置
+
+    |---------vebpack.prod.conf.js     webpack生产环境配置
+
+|------------config           项目配置
+
+    |---------dev.env.js           开发环境变量
+
+    |---------index.js              项目配置文件
+
+    |---------prod.env.js         生产环境变量
+
+|------------node_modules         node的依赖包
+
+|------------src
+
+    |---------api                 请求相关封装
+
+        |------modules          各模块请求文件
+
+        |------http.js            axios封装
+
+        |------api.js             请求路径统一管理
+
+    |---------assets                 资源目录，这里的资源会被webpack构建
+
+    |---------components        		组件目录
+
+    |---------plugins             外部插件
+
+        |-----------vuetify.js      前端插件
+
+        |-----------et_icon_font     自定义图标字体库
+
+    |---------router
+
+        |-----------index.js               前端路由
+
+    |---------store                   内存包放各种公共资源以及静态资源
+
+            |-----------i18n        国际化文件夹
+
+            |-----------index.js      vuex组件
+
+    |---------page					页面文件
+
+    |--------Etoak.vue               易途专用根组件
+
+    |--------main.js                 入口js文件
+
+|------------static             纯静态资源，不会被webpack构建
+
+|------------index.html         入口页面
+
+|------------.babelrc            ES6语法编译配置
+
+|-----------.editorconfig      	定义代码格式
+
+|-----------.gitignore         	git 上传需要忽略的文件
+
+|-----------package.json       项目基本信息
+```
