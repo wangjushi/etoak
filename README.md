@@ -11,6 +11,8 @@
 * [编译安装](#编译安装)
 * [主要使用组件](#主要使用组件)
 	* [vuetify](#vuetify)
+		* [Grids(栅格)](#Grids(栅格))
+		* [Sheets(延展纸)](#Sheets(延展纸))
 	* [echarts](#echarts)
 	* [axios](#axios)
 	* [vuex](#vuex)
@@ -111,6 +113,54 @@ Windows 上安装 IntelliJ IDEA<br>
 当前工程使用的是vue2.5.2版本使用了很多组件和部分样式<br>
 ### vuetify
 `vuetify` 是 Vue.js 的头号组件库，自 2016 年以来一直在积极开发。该项目的目标是为用户提供使用 Material Design specification 构建丰富且引人入胜的 web 应用程序所需的一切。它通过一致的更新周期、对以前版本的长期支持 (LTS)、响应式社区参与、丰富的资源生态系统和对高质量组件的贡献来实现这一点。<br>
+#### Grids(栅格)
+Vuetify 附带了一个使用 flex-box 构建的 12 点栅格系统。 网格用于在应用程序的内容中创建特定布局。其中包含 5 种媒体断点，分别用于定位特定屏幕大小或方向：xs, sm, md, lg 和 xl。 这些分辨率在下面的视口断点表中定义，可以通过自定义 Breakpoint service 进行修改。<br>
+系统中大量使用了栅格进行系统的排本以适应多端系统如下代码片段:<br>
+``` html
+<v-col class="pa-4" cols="12" md="5">
+	<v-sheet color="grey darken-3 pa-5">
+	  <v-row>
+		<v-col cols="12" style="height: 204px;">
+		  <et-charts :option="flotDashboardChart"></et-charts>
+		</v-col>
+	  </v-row>
+	  <v-row>
+		<v-col cols="12" md="6">
+		  <span class="title d-flex justify-center">￥6321</span>
+		  <span class="subtitle-2 d-flex justify-center">业内平均薪资</span>
+		</v-col>
+		<v-col cols="12" md="6">
+		  <span class="title d-flex justify-center">￥12481</span>
+		  <span class="subtitle-2 d-flex justify-center">易途外包薪资</span>
+		</v-col>
+	  </v-row>
+	</v-sheet>
+</v-col>
+```
+```
+v-row 代表行分割
+v-col 代表列分割
+一行可以分割为12列 可以进行嵌套分割
+```
+效果如下:<br>
+![xg1](./img/xg1.jpg)<br>
+#### Sheets(延展纸)
+v-sheet 旨在为 Vuetify 中的其他 paper 组件提供支持。 它旨在用作低级组件。<br>
+``` html
+<v-sheet color="grey darken-3 pa-5">
+  <h1 class="title">最新合作项目</h1>
+  <p class="subtitle-2 font-weight-light">包括外包技术服务和独立研发项目:</p>
+  <div class="adminpro-message-list">
+	<ul class="message-list-menu">
+	  <li v-for="item in desserts"><span :class="dessertsClass(item.num)">{{item.num}}</span> <span class="message-info">{{item.message}}</span>
+		<span class="message-time">{{item.time}}</span>
+	  </li>
+	</ul>
+  </div>
+</v-sheet>
+```
+效果如下:<br>
+![xg2](./img/xg2.jpg)<br>
 ### echarts
 `echarts` 一个使用 JavaScript 实现的开源可视化库，可以流畅的运行在 PC 和移动设备上，兼容当前绝大部分浏览器（IE8/9/10/11，Chrome，Firefox，Safari等），底层依赖矢量图形库 ZRender，提供直观，交互丰富，可高度个性化定制的数据可视化图表。<br>
 ### axios
@@ -122,7 +172,7 @@ Windows 上安装 IntelliJ IDEA<br>
 ### vuescroll
 `vuescroll` vuescroll 是一款基于 Vue.js 自定义滚动条的插件，它有两种模式:<br>
 * native: 适用于 PC 端， 支持基本的自定义滚动条。
-* slide: 适用于移动端， 支持下拉-加载，上拉刷新，轮播等。
+* slide: 适用于移动端， 支持下拉-加载，上拉刷新，轮播等。<br>
 但是，这并不意味着 slide 模式只能用于移动端，只是因为移动端与 slide 模式更加契合而已。<br>
 ### vue-video-player
 `vue-video-player` 适用于 Vue 的 video.js 播放器组件。Video.js 是一个为HTML5世界而构建的网络视频播放器。它支持HTML5和Flash视频，以及YouTube和Vimeo（通过插件）。<br>
