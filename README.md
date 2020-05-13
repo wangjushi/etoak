@@ -6,6 +6,7 @@
 
 * [环境准备](#环境准备)
 	* [nodejs安装](#nodejs安装)
+	* [IntelliJ IDEA安装](#IntelliJ IDEA安装)
 * [无环境启动](#无环境启动)
 * [编译安装](#编译安装)
 * [主要使用组件](#主要使用组件)
@@ -22,7 +23,7 @@
 ## 环境准备
 拿到源码后需要配置启动环境<br>
 nodejs 用于Node.js是一个事件驱动I/O服务端JavaScript环境<br>
-
+IntelliJ IDEA 开发环境`墙裂推荐`使用IDEA方便之后的后台开发,还可以使用`VS Code`,`HBuilder X`等
 ### nodejs安装
 [nodejs下载地址](http://nodejs.cn/download/)<br>
 Windows 上安装 Node.js<br>
@@ -52,6 +53,41 @@ C:\Program Files\MySQL\MySQL Server 5.5\bin;C:\Program Files\nodejs\;
 C:\Users\rg\AppData\Roaming\npm
 ```
 我们可以看到环境变量中已经包含了C:\Program Files\nodejs\ 至此node环境已经安装完成
+### IntelliJ IDEA安装
+[IntelliJ IDEA下载地址](https://www.jetbrains.com/idea/download/#section=windows)<br>
+Windows 上安装 IntelliJ IDEA<br>
+![idea1](./img/idea1.jpg)<br>
+![idea2](./img/idea2.jpg)<br>
+步骤 1 : 双击下载后的安装包如下所示：<br>
+![idea3](./img/idea3.jpg)<br>
+步骤 2 : 点击以上的Next(下一步)，将出现如下界面：<br>
+![idea4](./img/idea4.jpg)<br>
+步骤 3 : 你可以修改目录，并点击 next（下一步）：<br>
+![idea5](./img/idea5.jpg)<br>
+步骤 4 : 可以选择创建桌面图标,配置关联文件等,并点击 next（下一步）：<br>
+![idea6](./img/idea6.jpg)<br>
+步骤 5 : 点击Install 开始安装<br>
+![idea7](./img/idea7.png)<br>
+安装过程：<br>
+![idea8](./img/idea8.png)<br>
+点击 Finish（完成）按钮退出安装向导。<br>
+打开安装完成后的IDEA<br>
+![idea9](./img/idea9.png)<br>
+是否导入配置，我选择的是不导入<br>
+后面请一路next直到激活界面，选择试用<br>
+![idea10](./img/idea10.png)<br>
+![idea11](./img/idea11.png)<br>
+## 无环境启动
+方式一:直接打开线上网站进行观看[链接](http://vue.etoak.com/)<br>
+方式二:启动下载目录中的nginx-1.16.1<br>
+进入目录按住Shift 点击鼠标右键<br>
+![img1](./img/img1.png)<br>
+选择`在此处打开 Powershell 窗口`打开命令行窗口 输入start nginx<回车>启动nginx 如下:<br>
+![img2](./img/img2.jpg)<br>
+在浏览器中直接访问[http://localhost:8090](http://localhost:8090)<br>
+输入.\nginx.exe -s stop 停止nginx 如下:<br>
+![img3](./img/img3.jpg)<br>
 ## 编译安装
+如已安装好环境请继续,如未安装好请看[环境准备](#环境准备)
 
 ## 主要使用技术
