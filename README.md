@@ -92,10 +92,10 @@ Windows 上安装 IntelliJ IDEA<br>
 进入下载文件中的et目录按住Shift 点击鼠标右键<br>
 ![img1](./img/img1.png)<br>
 选择`在此处打开 Powershell 窗口`打开命令行窗口 输入npm install<回车> 如下:<br>
-![img4](./img/img4.png)<br>
+![img4](./img/img4.jpg)<br>
 安装完成后会在et目录下生成node_modules目录<br>
 直接启动: 在Powershell窗口中直接输入npm run dev <回车> <br>
-![img5](./img/img5.png)<br>
+![img5](./img/img5.jpg)<br>
 在浏览器中直接访问[http://localhost:8090](http://localhost:8090)<br>
 在IDEA中启动:<br>
 ![img6](./img/img6.jpg)<br>
@@ -121,10 +121,10 @@ Windows 上安装 IntelliJ IDEA<br>
 `router` Vue Router 是 Vue.js 官方的路由管理器。它和 Vue.js 的核心深度集成，让构建单页面应用变得易如反掌。<br>
 ### vuescroll
 `vuescroll` vuescroll 是一款基于 Vue.js 自定义滚动条的插件，它有两种模式:<br>
-	native: 适用于 PC 端， 支持基本的自定义滚动条。
-	slide: 适用于移动端， 支持下拉-加载，上拉刷新，轮播等。
+* native: 适用于 PC 端， 支持基本的自定义滚动条。
+* slide: 适用于移动端， 支持下拉-加载，上拉刷新，轮播等。
 但是，这并不意味着 slide 模式只能用于移动端，只是因为移动端与 slide 模式更加契合而已。<br>
 ### vue-video-player
 `vue-video-player` 适用于 Vue 的 video.js 播放器组件。Video.js 是一个为HTML5世界而构建的网络视频播放器。它支持HTML5和Flash视频，以及YouTube和Vimeo（通过插件）。<br>
 ### vue-photo-preview
-`vue-photo-preview` vue-photo-preview是基于photoswipe的vue图片预览插件
+`vue-photo-preview` vue-photo-preview是基于photoswipe的vue图片预览插件<br>
