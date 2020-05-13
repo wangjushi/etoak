@@ -1420,6 +1420,7 @@ Windows 上安装 IntelliJ IDEA<br>
 在浏览器中直接访问[http://localhost:8090](http://localhost:8090)<br>
 输入.\nginx.exe -s stop 停止nginx 如下:<br>
 ![img3](./img/img3.jpg)<br>
+`或者执行nginx-1.16.1目录中的启动.bat/停止.bat`
 ## 编译安装
 如已安装好环境请继续,如未安装好请看[环境准备](#环境准备)<br>
 进入下载文件中的et目录按住Shift 点击鼠标右键<br>
@@ -1430,6 +1431,7 @@ Windows 上安装 IntelliJ IDEA<br>
 直接启动: 在Powershell窗口中直接输入npm run dev <回车> <br>
 ![img5](./img/img5.jpg)<br>
 在浏览器中直接访问[http://localhost:8090](http://localhost:8090)<br>
+`或者执行et目录中的ETInstall.bat/ETRun.bat`
 在IDEA中启动:<br>
 ![img6](./img/img6.jpg)<br>
 选择et目录<br>
