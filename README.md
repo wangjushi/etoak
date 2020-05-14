@@ -131,8 +131,6 @@ v-row 代表行分割
 v-col 代表列分割
 一行可以分割为12列 可以进行嵌套分割
 ```
-效果如下:<br>
-![xg1](./img/xg1.jpg)<br>
 #### Sheets(延展纸)
 v-sheet 旨在为 Vuetify 中的其他 paper 组件提供支持。 它旨在用作低级组件。<br>
 ``` html
