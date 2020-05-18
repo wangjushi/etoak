@@ -1,6 +1,6 @@
 易途网站教程文档
 ===
-vue.etoak.com
+[vue.etoak.com](http://vue.etoak.com)
 # 目录
 
 * [目录结构](#目录结构)
